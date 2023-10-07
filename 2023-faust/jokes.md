@@ -148,7 +148,7 @@ Example output:
 ```py
 {"Animal":["Q: Can a kangaroo jump higher than the Empire State Building? A: Of course. The Empire State Building can't jump.","Q: Why couldn't the leopard play hide and seek? A: Because he was always spotted."],"Blonde":["A blonde, a redhead, and a brunette were all lost in the desert. They found a lamp and rubbed it. A genie popped out and granted them each one wish. The redhead wished to be back home. Poof! She was back home. The brunette wished to be at home with her family. Poof! She was back home with her family. The blonde said"],"Dad":["FAUST_tpYmKVpLTCWDsOIZXa2APD6awRFBhfxi", "FAUST_6SgoNljU4hikeipPGRNA0VkYZdI4UqDI", "FAUST_bcjJuN9LKGDir5gzIHPkbEA9XfvpHwKv"]}
 ```
-By altering the value of the privileges key from `admin` to `public` in the last request to `/profile`, we can export every joke that has been created even though we are not administrator.
+By altering the value of the privileges key from `admin` to `public` in the last request to `/profile`, we can backup every joke that has been created even though we are not administrator.
 
 ## Patching
 To patch the exploit, the only thing we have to do is to block access to the backup function if we are not an administrator. The following code shows a patched version of the service:
