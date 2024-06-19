@@ -1,6 +1,8 @@
 Author: 0x6fe1be2
 
-Version 27-03-24
+Version 19-06-24
+
+[TOC]
 
 # [justCTF 2024 teaser](https://ctftime.org/event/2342) (15.06-16.06)
 
