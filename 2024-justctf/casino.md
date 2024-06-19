@@ -69,7 +69,7 @@ app.post("/bet", (req, res) => {
 
 ```
 
-this uses the values`req.user.serverSeed`, `clientSeed` and `req.user.nonce` for to generate a object that combined into a string using`JSON.stringify` each bet. Notable observation are:  
+this uses the values`req.user.serverSeed`, `clientSeed` and `req.user.nonce` to generate a object that is turned into string using`JSON.stringify` for each bet. Notable observation are:  
 
 + serverSeed is securely randomly generated (and not changed) and 64 bytes long
 + clientSeed is provided for the user for each bet and 64 bytes long
@@ -123,9 +123,9 @@ function mixkey(seed, key) {
 ...
 ```
 
-as we can see the seed wraps arround after 0x100 characters and 'insecurly' combines the values, especially if we consider that `stringseed.charCodeAt(j)` can return values larger than 0x1000.
+as we can see the seed wraps arround after 0x100 characters and 'insecurly' combines the values, especially if we consider that `stringseed.charCodeAt(j)` can return values larger than 0x100.
 
-so let's try to create collision:
+so let's try to create collisions:
 
 ### PoC
 
@@ -189,14 +189,15 @@ JSON stringify actually escapes certain string, notably these:
 
 which we can use to increase the size of our client_seed to (and above) the desired length of 0x100.
 
-Sadly i ran into an issue here, I wrote my exploit in python and hopped that `json.dumps` creates the same strings as `JSON.stringify`, which is not the case, and can easily be tested like this:
+Sadly i ran into an issue here, I wrote my exploit in python and hoped that `json.dumps` creates the same strings as `JSON.stringify`, which is not the case, and can easily be tested like this:
 
 ```js
 for(let i = 0; i < 0x1000; i++)
   if(JSON.stringify(String.fromCharCode(i)).length != 3)
     console.log(i)
 ```
-and for pythone
+
+and for python
 
 ```python
 import json
@@ -205,14 +206,15 @@ for i in range(0x100):
 		print(i)
 ```
 
-notably all charcters after 0x7f are unicode escaped to 6 bytes in pythone, which is not the case for js.
+notably all charcters after 0x7f are unicode escaped to 6 bytes in python, which is not the case for js.
 
 so we just create a comparable list ourselves using this:
+
 ```python
 printables = list(filter(lambda x: chr(x) not in ('"', '\\'), range(32, 0x1001)))
 ```
 
-We can now combine all our techniques to write and exploit and get the flag.
+We can now combine all our techniques to write an exploit and get the flag.
 
 ### Exploit
 
@@ -231,7 +233,6 @@ import subprocess
 
 
 URL = 'http://casino.web.jctf.pro'
-
 # URL = 'http://localhost:3030'
 
 def gen_random(length: int, alphabet: str = string.ascii_lowercase) -> str:
@@ -334,18 +335,6 @@ def gen(n1=0, cnt=9, prefix='{"serverSeed":"24fc5b5e3a5bd0aa85b1cc9c116eef52feee
     outs.append(clash)
 
   return outs
-
-# username = gen_random(10)
-# password = gen_random(12, alphabet=string.ascii_letters + string.digits)
-# 
-# session = requests.Session()
-# reg_user(session, username, password)
-# 
-# for s in gen(0, 1):
-#   bet_data = bet(session, 50, 1, s)
-#   print(bet_data, end='\n')
-# 
-# exit(0)
 
 while True:
   username = gen_random(10)
