@@ -207,10 +207,11 @@ while True:
           break 
 
       if ddt.microseconds < THRESHOLD:
-        if retries > 0:
+        if retries > 1:
           info.failure('failed twice sth is wrong')
           exit(1)
         info.status("retrying, very low delta '%s': %d", pw, ddt.microseconds)
+        pw = pw[:-1]
         retries += 1
         continue
 
