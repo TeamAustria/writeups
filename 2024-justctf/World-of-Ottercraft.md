@@ -349,7 +349,7 @@ So our plan now: get equipped, generate a bunch of monsters for our quest board,
 
 There is just a small roadblock: the generated tickets must always be consumed by the `checkout` function, otherwise the transaction is illegal. Luckily, we can always call `checkout` from any state, and so we can make sure to buy a cheap shield while we are shopping, and still make big profits.
 
-Coding all of this out results in this here (excuse me for the code duplication, this was before I figured out exactly how loops worked in the move programming language, since I initially only tried a for loop, which seems to not exist):
+Coding all of this out results in this here:
 ```rust
 module solve::solve {
 
