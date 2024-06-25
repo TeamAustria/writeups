@@ -1,13 +1,13 @@
 BudgetSoC Writeup
 =================
 
-justCTF 2024 Teaser (15.06.2024 - 16.06.2024)
+[justCTF 2024 Teaser](https://2024.justctf.team/) (15.06.2024 - 16.06.2024)
 
-Category: Misc, Forensics
-
-Points: 363 (10 Solves)
-
-Author: berndoJ, Solved together with popax21 and neverbolt
+>[!NOTE]
+>Category: Misc, Forensics <br>
+>Points: 363 (10 Solves)<br>
+>Author: [berndoJ](https://github.com/berndoJ)
+>Solved together with [Popax21](https://github.com/Popax21) and [neverbolt](https://github.com/Neverbolt)
 
 We were given the following prompt:
 >We've obtained a mysterious device. Our forensic team tried to retrieve the
